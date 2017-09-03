@@ -64,7 +64,7 @@ def complexity_svc(X, y):
         'svm__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
         'svm__gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000]}
 
-    grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=10, scoring='neg_log_loss')
+    grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=10, scoring='neg_log_loss', verbose=5)
     grid_search.fit(X_train_res, y_train_res)
     clf = grid_search.best_estimator_
     print('clf', clf)
@@ -86,10 +86,8 @@ def complexity_svc(X, y):
 if  __name__== '__main__':
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
-    df = Parallel(n_jobs=6)(delayed(fit_svc)(train=train, target=target, size=size) for size in [0.4, 0.9])
+    #df = Parallel(n_jobs=6)(delayed(fit_svc)(train=train, target=target, size=size) for size in [0.4, 0.9])
     #pool = multiprocessing.Pool(processes=6)
     #df = pool.starmap(fit_svc, zip(repeat(train, target), range(0.4,0.6,0.1)))
-    range(0, 10 * offset, offset)
-    #df = train_size_svc(train, target)
-    print(df)
-    #clf, score, mat = complexity_svc(train, target)
+    #print(df)
+    clf, score, mat = complexity_svc(train, target)
