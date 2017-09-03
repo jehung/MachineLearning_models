@@ -16,21 +16,25 @@ import multiprocessing
 pd.set_option('display.max_columns', None)
 import get_all_data
 import utility
+from itertools import repeat
 
+
+d = {'train': [], 'cv set': [], 'test': []}
 
 
 def train_size_svc(X, y):
-    d = {'train': [], 'cv set': [], 'test': []}
     training_features, test_features, \
     training_target, test_target, = train_test_split(X, y, test_size=0.33, random_state=778)
     return training_features, test_features, training_target, test_target, d
 
 
-def fit_svc(X, y, size):
+
+
+def fit_svc(train=None, target=None, size=0):
     #for size in [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
     print('size', size)
-    training_features, test_features, training_target, test_target, d = train_size_svc(X, y)
     print('here')
+    training_features, test_features, training_target, test_target, d = train_size_svc(train, target)
     X_train, X_val, y_train, y_val = train_test_split(training_features, training_target, train_size=size)
     smote = SMOTE(ratio=1)
     X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
@@ -82,7 +86,10 @@ def complexity_svc(X, y):
 if  __name__== '__main__':
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
-    df = Parallel(n_jobs=6)(delayed(fit_svc)(train, target, size) for size in [0.4, 0.9])
+    df = Parallel(n_jobs=6)(delayed(fit_svc)(train=train, target=target, size=size) for size in [0.4, 0.9])
+    #pool = multiprocessing.Pool(processes=6)
+    #df = pool.starmap(fit_svc, zip(repeat(train, target), range(0.4,0.6,0.1)))
+    range(0, 10 * offset, offset)
     #df = train_size_svc(train, target)
     print(df)
     #clf, score, mat = complexity_svc(train, target)
