@@ -19,12 +19,17 @@ import utility
 
 
 
-def train_size_svc(X, y, size):
+def train_size_svc(X, y):
     d = {'train': [], 'cv set': [], 'test': []}
     training_features, test_features, \
-    training_target, test_target, = train_test_split(X, y, test_size=0.2, random_state=12)
+    training_target, test_target, = train_test_split(X, y, test_size=0.33, random_state=778)
+    return training_features, test_features, training_target, test_target, d
+
+
+def fit_svc(X, y, size):
     #for size in [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
     print('size', size)
+    training_features, test_features, training_target, test_target, d = train_size_svc(X, y)
     print('here')
     X_train, X_val, y_train, y_val = train_test_split(training_features, training_target, train_size=size)
     smote = SMOTE(ratio=1)
@@ -36,8 +41,8 @@ def train_size_svc(X, y, size):
     d['train'].append(f1_score(y_train_res, clf.predict(X_train_res), average='weighted'))
     d['cv set'].append(f1_score(y_val, clf.predict(X_val), average='weighted'))
     d['test'].append(f1_score(test_target, clf.predict(test_features), average='weighted'))
-
     print('end')
+
     return d
 
 
@@ -48,13 +53,12 @@ def complexity_svc(X, y):
     smote = SMOTE(ratio=1)
     X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
     print('Start Search')
-    svc= SVC()
+    svm= SVC()
     pipe = Pipeline([('smote', smote), ('svm', svm)])
     param_grid = {
         'svm__kernel': ('rbf', 'sigmoid'),
         'svm__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
-        'svm__gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
-    }
+        'svm__gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000]}
 
     grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=10, scoring='neg_log_loss')
     grid_search.fit(X_train_res, y_train_res)
@@ -78,9 +82,7 @@ def complexity_svc(X, y):
 if  __name__== '__main__':
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
-    num_cores = multiprocessing.cpu_count()
-    results = Parallel(n_jobs=num_cores)(delayed(train_size_svc)(train, target, size) for size in [0.4, 0.5])
-    df = train_size_svc(train, target)
+    df = Parallel(n_jobs=6)(delayed(fit_svc)(train, target, size) for size in [0.4, 0.9])
+    #df = train_size_svc(train, target)
     print(df)
-    clf, score, mat = complexity_svc(train, target)
-    print(df)
+    #clf, score, mat = complexity_svc(train, target)
