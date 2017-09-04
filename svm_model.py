@@ -54,15 +54,15 @@ def fit_svc(train=None, target=None, size=0):
 def complexity_svc(X, y):
     #X_train, y_train, X_test, y_test = train_test_split(X,y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=778)
-    smote = SMOTE(ratio=1)
-    X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
+    #smote = SMOTE(ratio=1)
+    #X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
     print('Start Search')
-    svm= SVC()
-    pipe = Pipeline([('smote', smote), ('svm', svm)])
+    svm= SVC(class_weight='balanced', probability=True)
+    pipe = Pipeline([('svm', svm)])
     param_grid = {
         'svm__C': [0.001, 0.01, 0.1, 1, 10, 100]}
     grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=3, scoring='neg_log_loss', verbose=5)
-    grid_search.fit(X_train_res, y_train_res)
+    grid_search.fit(X_train, y_train)
     clf = grid_search.best_estimator_
     print('clf', clf)
     print('best_score', grid_search.best_score_)
