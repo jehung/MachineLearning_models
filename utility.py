@@ -23,3 +23,20 @@ def complexity_dt(X, y):
     plt.show()    
     return clf, clf.predict(X_train_res), y_pred
 
+
+def merge_dict(dicts):
+    """dicts: a list of dicts"""
+    super_dict = {}
+    for d in dicts:
+        for k, v in d.iteritems():  # d.items() in Python 3+
+            super_dict.setdefault(k, []).append(v)
+
+    df = pd.DataFrame.from_dict(super_dict)
+    df.plot()
+    plt.show()
+
+    return df
+
+
+
+
