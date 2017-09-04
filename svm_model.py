@@ -60,11 +60,8 @@ def complexity_svc(X, y):
     svm= SVC()
     pipe = Pipeline([('smote', smote), ('svm', svm)])
     param_grid = {
-        'svm__kernel': ('rbf', 'sigmoid'),
-        'svm__C': [0.001, 0.01, 0.1, 1, 10, 100, 1000],
-        'svm__gamma': [0.001, 0.01, 0.1, 1, 10, 100, 1000]}
-
-    grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=10, scoring='neg_log_loss', verbose=5)
+        'svm__C': [0.001, 0.01, 0.1, 1, 10, 100]}
+    grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=3, scoring='neg_log_loss', verbose=5)
     grid_search.fit(X_train_res, y_train_res)
     clf = grid_search.best_estimator_
     print('clf', clf)
