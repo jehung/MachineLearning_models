@@ -5,7 +5,6 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 import itertools
 from dateutil.relativedelta import relativedelta
-from sklearn.cross_validation import train_test_split
 import sklearn.tree as tree
 from sklearn.neural_network import MLPClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
