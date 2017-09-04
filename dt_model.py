@@ -66,7 +66,7 @@ def complexity_dt(X, y):
     utility.plot_confusion_matrix(conf_mat, classes=target_names,
                       title='Confusion matrix, without normalization')
     plt.show()
-    return clf, clf.predict(X_train_res), y_pred
+    return clf, clf.predict(X_train), y_pred
 
 
 
