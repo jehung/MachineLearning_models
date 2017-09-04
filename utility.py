@@ -1,34 +1,49 @@
-def complexity_dt(X, y):
-    X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=778)
-    smote = SMOTE(ratio=1)
-    X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
-    print('Start Decision Tree Search')
-    clf = tree.DecisionTreeClassifier(criterion='gini', class_weight='balanced')
-    pipe = Pipeline([('smote', smote), ('dt', clf)])
-    param_grid = {'dt__max_depth': [2, 3, 4, 5, 6, 7, 8]}
-    #sss = StratifiedShuffleSplit(n_splits=500, test_size=0.2)  ## no need for this given 50000 random sample
-    grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=10, scoring='neg_log_loss',verbose=5)
-    grid_search.fit(X_train_res, y_train_res)
-    clf = grid_search.best_estimator_
-    print('clf', clf)
-    print('best_score', grid_search.best_score_)
-    y_pred = clf.predict(X_test)
-    check_pred = clf.predict(X_train)
-    target_names = ['Not delinq', 'Delinq']
-    print(classification_report(y_test, y_pred, target_names=target_names))
-    conf_mat = confusion_matrix(y_test, y_pred)
-    plt.figure()
-    plot_confusion_matrix(conf_mat, classes=target_names,
-                      title='Confusion matrix, without normalization')
-    plt.show()    
-    return clf, clf.predict(X_train_res), y_pred
+import matplotlib.pyplot as plt
+import pandas as pd
+import numpy as np
+
+
+
+def plot_confusion_matrix(cm, classes,
+                          normalize=False,
+                          title='Confusion matrix',
+                          cmap=plt.cm.Blues):
+    """
+    This function prints and plots the confusion matrix.
+    Normalization can be applied by setting `normalize=True`.
+    """
+    if normalize:
+        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        print("Normalized confusion matrix")
+    else:
+        print('Confusion matrix, without normalization')
+
+    print(cm)
+
+    plt.imshow(cm, interpolation='nearest', cmap=cmap)
+    plt.title(title)
+    plt.colorbar()
+    tick_marks = np.arange(len(classes))
+    plt.xticks(tick_marks, classes, rotation=45)
+    plt.yticks(tick_marks, classes)
+
+    fmt = '.2f' if normalize else 'd'
+    thresh = cm.max() / 2.
+    for i, j in itertools.product(range(cm.shape[0]), range(cm.shape[1])):
+        plt.text(j, i, format(cm[i, j], fmt),
+                 horizontalalignment="center",
+                 color="white" if cm[i, j] > thresh else "black")
+
+    plt.tight_layout()
+    plt.ylabel('True label')
+    plt.xlabel('Predicted label')
 
 
 def merge_dict(dicts):
     """dicts: a list of dicts"""
     super_dict = {}
     for d in dicts:
-        for k, v in d.iteritems():  # d.items() in Python 3+
+        for k, v in d.items():  # d.items() in Python 3+
             super_dict.setdefault(k, []).append(v)
 
     df = pd.DataFrame.from_dict(super_dict)
