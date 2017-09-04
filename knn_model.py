@@ -1,8 +1,9 @@
 import numpy as np
 import pandas as pd
 from datetime import datetime
+import time
 import matplotlib.pyplot as plt
-from sklearn.svm import SVC
+from sklearn.neighbors import KNeighborsClassifier
 from imblearn.over_sampling import SMOTE, ADASYN
 from imblearn.combine import SMOTEENN
 from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, f1_score
@@ -22,37 +23,47 @@ from itertools import repeat
 d = {'train': None, 'cv set': None, 'test': None}
 
 
-def fit_svc(train=None, target=None, size=0):
+def train_size_svc(X, y):
+    training_features, test_features, \
+    training_target, test_target, = train_test_split(X, y, test_size=0.33, random_state=778)
+    return training_features, test_features, training_target, test_target, d
+
+
+
+
+def fit_knn(train=None, target=None, size=0):
     #for size in [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
     print('size', size)
     print('here')
-    training_features, test_features, \
-    training_target, test_target, = train_test_split(train, target, test_size=0.33, random_state=778)
+    training_features, test_features, training_target, test_target, d = train_size_svc(train, target)
     X_train, X_val, y_train, y_val = train_test_split(training_features, training_target, train_size=size)
-    #smote = SMOTE(ratio=1)
-    #X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
+    smote = SMOTE(ratio=1)
+    X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
     print('start')
-    clf = SVC(verbose=True)
-    clf.fit(X_train, y_train)
-    d['train'] = f1_score(y_train, clf.predict(X_train), average='weighted')
-    d['cv set'] = f1_score(y_val, clf.predict(X_val), average='weighted')
-    d['test'] = f1_score(test_target, clf.predict(test_features), average='weighted')
+    start_time = time.time()
+    clf = KNeighborsClassifier(n_neighbors=5)
+    clf.fit(X_train_res, y_train_res)
+    print('KNN took', time.time() - start_time, 'to run')
+    print('process')
+    d['train'].append(f1_score(y_train_res, clf.predict(X_train_res), average='weighted'))
+    d['cv set'].append(f1_score(y_val, clf.predict(X_val), average='weighted'))
+    d['test'].append(f1_score(test_target, clf.predict(test_features), average='weighted'))
     print('end')
 
     return d
 
 
 
-def complexity_svc(X, y):
+def complexity_knn(X, y):
     #X_train, y_train, X_test, y_test = train_test_split(X,y)
     X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=778)
     #smote = SMOTE(ratio=1)
     #X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
     print('Start Search')
-    svm= SVC(class_weight='balanced', probability=True)
-    pipe = Pipeline([('svm', svm)])
+    knn= KNeighborsClassifier()
+    pipe = Pipeline([('knn', knn)])
     param_grid = {
-        'svm__C': [0.001, 0.01, 0.1, 1, 10, 100]}
+        'knn__n_neighbors': [3,7,11]}
     grid_search = GridSearchCV(estimator=pipe, param_grid=param_grid, n_jobs=6, cv=3, scoring='neg_log_loss', verbose=5)
     grid_search.fit(X_train, y_train)
     clf = grid_search.best_estimator_
@@ -75,9 +86,8 @@ def complexity_svc(X, y):
 if  __name__== '__main__':
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
-    #df = Parallel(n_jobs=6)(delayed(fit_svc)(train=train, target=target, size=size) for size in np.arange(0.1, 1, 0.1))
-    #df = utility.merge_dict(df)
+    #df = Parallel(n_jobs=6)(delayed(fit_svc)(train=train, target=target, size=size) for size in [0.4, 0.9])
     #pool = multiprocessing.Pool(processes=6)
-    #df = pool.starmap(fit_svc, zip(repeat(train, target), range(0.4,0.6,0.1)))
+    #df = pool.starmap(fit_knn, zip(repeat(train, target), range(0.4,0.6,0.1)))
     #print(df)
-    clf, score, mat = complexity_svc(train, target)
+    clf, score, mat = complexity_knn(train, target)
