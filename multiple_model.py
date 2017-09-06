@@ -27,8 +27,30 @@ import utility
 
 
 
+models = {
+    'DecisionTree': DecisionTreeClassifier(class_weight='balanced'),
+    #'NeuralNetwork': MLPClassifier(),
+    'GradientBoosting': GradientBoostingClassifier(n_estimators=10),
+    #'SupportVectorMachine': SVC(class_weight='balanced', probability=True),
+    #'KNearestNeighbor': KNeighborsClassifier(n_neighbors=5)
+}
 
-#d = {'train': None, 'cv set': None, 'test': None}
+params1 = {
+    'DecisionTree': {'max_depth': [1]},
+    #'NeuralNetwork': {'hidden_layer_sizes': [(160, 112, 112, 112, 112)]},
+    'GradientBoosting': {'max_depth': [1]},
+    #'SupportVectorMachine': {'C': [1]},
+    #'KNearestNeighbor': {'n_neighbors': [7]}
+}
+
+
+params2 = {
+    'DecisionTree': {'max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
+    'NeuralNetwork': {'hidden_layer_sizes': [(160), (160, 112, 112), (160, 112, 112, 112, 112), (160, 112, 112, 112, 112, 112, 112)]},
+    'GradientBoosting': {'max_depth': [1, 2, 3]},
+    'SupportVectorMachine': {'C': [0.001, 0.01, 0.1, 1, 10, 100]},
+    'KNearestNeighbor': {'n_neighbors': [3,7,11]}}
+
 
 
 class EstimatorSelectionHelper:
@@ -75,37 +97,9 @@ class EstimatorSelectionHelper:
 
 
 
-models = {
-    'DecisionTree': DecisionTreeClassifier(class_weight='balanced'),
-    #'NeuralNetwork': MLPClassifier(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=10),
-    #'SupportVectorMachine': SVC(class_weight='balanced', probability=True),
-    #'KNearestNeighbor': KNeighborsClassifier(n_neighbors=5)
-}
-
-params1 = {
-    'DecisionTree': {'max_depth': [1]},
-    #'NeuralNetwork': {'hidden_layer_sizes': [(160, 112, 112, 112, 112)]},
-    'GradientBoosting': {'max_depth': [1]},
-    #'SupportVectorMachine': {'C': [1]},
-    #'KNearestNeighbor': {'n_neighbors': [7]}
-}
-
-
-params2 = {
-    'DecisionTree': {'max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
-    'NeuralNetwork': {'hidden_layer_sizes': [(160), (160, 112, 112), (160, 112, 112, 112, 112), (160, 112, 112, 112, 112, 112, 112)]},
-    'GradientBoosting': {'max_depth': [1, 2, 3]},
-    'SupportVectorMachine': {'C': [0.001, 0.01, 0.1, 1, 10, 100]},
-    'KNearestNeighbor': {'n_neighbors': [3,7,11]}}
-
-
-
-
 def plot_learning_curve(estimator, X, y, ylim=None, cv=None,
                         n_jobs=1, train_sizes=np.linspace(.3, 1.0, 5)):
     plt.figure()
-    plt.title("Learning Curves: ")
     if ylim is not None:
         plt.ylim(*ylim)
     plt.xlabel("Training examples")
@@ -128,8 +122,8 @@ def plot_learning_curve(estimator, X, y, ylim=None, cv=None,
     plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
              label="Cross-validation score")
     plt.legend(loc="best")
-    plt.show()
     return plt
+
 
 
 
@@ -149,6 +143,6 @@ if __name__ == '__main__':
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
     df = Parallel(n_jobs=6)(delayed(plot_learning_curve)(estimator=models[model], X=train, y=target, ylim=(0.05, 1.01), cv=10) for model in models)
-
+    plt.show()
 
 #analysis2 = complexity()
