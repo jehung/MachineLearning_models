@@ -73,6 +73,28 @@ class EstimatorSelectionHelper:
         return df[columns]
 
 
+    def train_size_summary(self, sort_by='mean_score'):
+        def row_report(key, scores, params):
+            d = {
+                'estimator': key,
+                'min_score': min(scores),
+                'max_score': max(scores),
+                'mean_score': scores.mean(),
+                'std_score': scores.std()
+            }
+            return pd.Series({**params, **d})
+
+        rows = [row(k, gsc.cv_validation_scores, gsc.parameters)
+                for k in self.keys
+                for gsc in self.grid_searches[k].grid_scores_]
+        df = pd.concat(rows, axis=1).T.sort_values([sort_by], ascending=False)
+
+        columns = ['estimator', 'min_score', 'mean_score', 'max_score', 'std_score']
+        columns = columns + [c for c in df.columns if c not in columns]
+        print(df[columns])
+        return df[columns]
+
+
 models = {
     'DecisionTree': DecisionTreeClassifier(class_weight='balanced'),
     'NeuralNetwork': MLPClassifier(),
@@ -100,6 +122,7 @@ params2 = {
 
 
 def train_size():
+    d = {'model': None, 'train': None, 'cv set': None, 'test': None}
     helper1 = EstimatorSelectionHelper(models, params1)
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
@@ -109,7 +132,11 @@ def train_size():
     for size in np.arange(0.3, 1, 0.1):
         X_train, X_val, y_train, y_val = train_test_split(training_features, training_target, train_size=size)
         helper1.fit(X_train, y_train, scoring='f1', n_jobs=1)
-        helper1.score_summary(sort_by='min_score')
+        d['model'] = helper1.key
+        d['train'] = f1_score(y_train, clf.predict(X_train), average='weighted')
+        d['cv set'] = f1_score(y_val, clf.predict(X_val), average='weighted')
+        d['test'] = f1_score(test_target, clf.predict(test_features), average='weighted')
+    return d
 
 
 def complexity():
@@ -123,5 +150,5 @@ def complexity():
     helper1.score_summary(sort_by='min_score')
 
 
-#analysis1 = train_size()
-analysis2 = complexity()
+analysis1 = train_size()
+#analysis2 = complexity()
