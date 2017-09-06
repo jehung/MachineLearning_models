@@ -23,31 +23,24 @@ from itertools import repeat
 d = {'train': None, 'cv set': None, 'test': None}
 
 
-def train_size_svc(X, y):
-    training_features, test_features, \
-    training_target, test_target, = train_test_split(X, y, test_size=0.33, random_state=778)
-    return training_features, test_features, training_target, test_target, d
-
-
-
 
 def fit_knn(train=None, target=None, size=0):
     #for size in [0.4, 0.5, 0.6, 0.7, 0.8, 0.9]:
     print('size', size)
     print('here')
-    training_features, test_features, training_target, test_target, d = train_size_svc(train, target)
+    training_features, test_features, \
+    training_target, test_target, = train_test_split(train, target, test_size=0.33, random_state=778)
     X_train, X_val, y_train, y_val = train_test_split(training_features, training_target, train_size=size)
-    smote = SMOTE(ratio=1)
-    X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
+    #smote = SMOTE(ratio=1)
+    #X_train_res, y_train_res = smote.fit_sample(X_train, y_train)
     print('start')
     start_time = time.time()
     clf = KNeighborsClassifier(n_neighbors=5)
-    clf.fit(X_train_res, y_train_res)
+    clf.fit(X_train, y_train)
     print('KNN took', time.time() - start_time, 'to run')
-    print('process')
-    d['train'].append(f1_score(y_train_res, clf.predict(X_train_res), average='weighted'))
-    d['cv set'].append(f1_score(y_val, clf.predict(X_val), average='weighted'))
-    d['test'].append(f1_score(test_target, clf.predict(test_features), average='weighted'))
+    d['train'] = f1_score(y_train, clf.predict(X_train), average='weighted')
+    d['cv set'] = f1_score(y_val, clf.predict(X_val), average='weighted')
+    d['test'] = f1_score(test_target, clf.predict(test_features), average='weighted')
     print('end')
 
     return d
@@ -86,8 +79,9 @@ def complexity_knn(X, y):
 if  __name__== '__main__':
     all_data = get_all_data.get_all_data()
     train, target = get_all_data.process_data(all_data)
-    #df = Parallel(n_jobs=6)(delayed(fit_svc)(train=train, target=target, size=size) for size in [0.4, 0.9])
+    df = Parallel(n_jobs=6)(delayed(fit_knn)(train=train, target=target, size=size) for size in np.arange(0.1, 1, 0.1))
+    utility.merge_dict(df)
     #pool = multiprocessing.Pool(processes=6)
     #df = pool.starmap(fit_knn, zip(repeat(train, target), range(0.4,0.6,0.1)))
-    #print(df)
-    clf, score, mat = complexity_knn(train, target)
+    print(df)
+    #clf, score, mat = complexity_knn(train, target)
