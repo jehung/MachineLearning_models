@@ -96,17 +96,15 @@ class EstimatorSelectionHelper:
 
 
 
-
-def plot_learning_curve(estimator, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.3, 1.0, 5)):
+def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
+                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5000)):
     plt.figure()
+    plt.title(title)
     if ylim is not None:
         plt.ylim(*ylim)
     plt.xlabel("Training examples")
     plt.ylabel("Score")
     train_sizes, train_scores, test_scores = learning_curve(estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)
-    return train_sizes, train_scores, test_scores
-
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -122,8 +120,8 @@ def plot_learning_curve(estimator, X, y, ylim=None, cv=None,
     plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
              label="Cross-validation score")
     plt.legend(loc="best")
+#    plt.show()
     return plt
-
 
 
 
@@ -139,10 +137,12 @@ def complexity():
 
 
 
-if __name__ == '__main__':
-    all_data = get_all_data.get_all_data()
-    train, target = get_all_data.process_data(all_data)
-    df = Parallel(n_jobs=6)(delayed(plot_learning_curve)(estimator=models[model], X=train, y=target, ylim=(0.05, 1.01), cv=10) for model in models)
+
+all_data = get_all_data.get_all_data()
+train, target = get_all_data.process_data(all_data)
+for model in models:
+    title = 'Learning Curves: ' + model
+    plot_learning_curve(models[model], title, X=train, y=target, ylim=(0.65, 1.01), cv=10)
     plt.show()
 
 #analysis2 = complexity()
