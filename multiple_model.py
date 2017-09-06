@@ -41,7 +41,7 @@ class EstimatorSelectionHelper:
         self.keys = models.keys()
         self.grid_searches = {}
 
-    def fit(self, X, y, cv=10, n_jobs=-1, verbose=5, scoring=None, refit=False):
+    def fit(self, X, y, cv=10, n_jobs=-1, verbose=5, scoring=None, refit=True):
         for key in self.keys:
             print("Running GridSearchCV for %s." % key)
             model = self.models[key]
@@ -121,21 +121,14 @@ params2 = {
 
 
 
-def train_size():
-    d = {'model': None, 'train': None, 'cv set': None, 'test': None}
+def train_size(train=None, target=None, size=0):
     helper1 = EstimatorSelectionHelper(models, params1)
-    all_data = get_all_data.get_all_data()
-    train, target = get_all_data.process_data(all_data)
-    training_features, test_features, \
-        training_target, test_target, = train_test_split(train, target, test_size=0.33, random_state=778)
-
-    for size in np.arange(0.3, 1, 0.1):
-        X_train, X_val, y_train, y_val = train_test_split(training_features, training_target, train_size=size)
-        helper1.fit(X_train, y_train, scoring='f1', n_jobs=1)
-        d['model'] = helper1.key
-        d['train'] = f1_score(y_train, clf.predict(X_train), average='weighted')
-        d['cv set'] = f1_score(y_val, clf.predict(X_val), average='weighted')
-        d['test'] = f1_score(test_target, clf.predict(test_features), average='weighted')
+    X_train, X_val, y_train, y_val = train_test_split(train, target, train_size=size)
+    helper1.fit(X_train, y_train, scoring='f1')
+    d['model'] = helper1.key
+    d['train'] = f1_score(y_train, clf.predict(X_train), average='weighted')
+    d['cv set'] = f1_score(y_val, clf.predict(X_val), average='weighted')
+    d['test'] = f1_score(test_target, clf.predict(test_features), average='weighted')
     return d
 
 
@@ -150,5 +143,14 @@ def complexity():
     helper1.score_summary(sort_by='min_score')
 
 
-analysis1 = train_size()
+#analysis1 = train_size()
+if  __name__== '__main__':
+    d = {'model': None, 'train': None, 'cv set': None, 'test': None}
+    all_data = get_all_data.get_all_data()
+    train, target = get_all_data.process_data(all_data)
+    training_features, test_features, \
+    training_target, test_target, = train_test_split(train, target, test_size=0.33, random_state=778)
+    df = Parallel(n_jobs=6)(delayed(train_size)(train=training_features, target=training_target, size=size) for size in np.arange(0.3, 1, 0.1))
+    utility.merge_dict(df)
+    print(df)
 #analysis2 = complexity()
