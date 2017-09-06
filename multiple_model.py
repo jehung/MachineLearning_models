@@ -28,9 +28,9 @@ import utility
 
 
 models = {
-    'DecisionTree': DecisionTreeClassifier(class_weight='balanced'),
+    'DecisionTree': DecisionTreeClassifier(class_weight='balanced', max_depth=13),
     #'NeuralNetwork': MLPClassifier(),
-    'GradientBoosting': GradientBoostingClassifier(n_estimators=10),
+    'GradientBoosting': GradientBoostingClassifier(max_depth=1, n_estimators=50),
     #'SupportVectorMachine': SVC(class_weight='balanced', probability=True),
     #'KNearestNeighbor': KNeighborsClassifier(n_neighbors=5)
 }
@@ -97,14 +97,15 @@ class EstimatorSelectionHelper:
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5000)):
+                        n_jobs=1, train_sizes=[0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9], scoring=None):
     plt.figure()
     plt.title(title)
     if ylim is not None:
         plt.ylim(*ylim)
     plt.xlabel("Training examples")
     plt.ylabel("Score")
-    train_sizes, train_scores, test_scores = learning_curve(estimator, X, y, cv=cv, n_jobs=n_jobs, train_sizes=train_sizes)
+    train_sizes, train_scores, test_scores = learning_curve(estimator, X, y, cv=cv, n_jobs=n_jobs, \
+                                                            train_sizes=train_sizes, scoring=scoring)
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -120,7 +121,6 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     plt.plot(train_sizes, test_scores_mean, 'o-', color="g",
              label="Cross-validation score")
     plt.legend(loc="best")
-#    plt.show()
     return plt
 
 
@@ -142,7 +142,10 @@ all_data = get_all_data.get_all_data()
 train, target = get_all_data.process_data(all_data)
 for model in models:
     title = 'Learning Curves: ' + model
-    plot_learning_curve(models[model], title, X=train, y=target, ylim=(0.65, 1.01), cv=10)
+    cv = ShuffleSplit(n_splits=10, test_size=0.2)
+    print(title)
+    plot_learning_curve(models[model], title, train, target, ylim=(0.1, 1.01), cv=cv, n_jobs=1)
     plt.show()
+
 
 #analysis2 = complexity()
