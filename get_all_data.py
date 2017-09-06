@@ -18,6 +18,7 @@ from sklearn.preprocessing import label_binarize
 from sklearn.preprocessing import scale
 from sklearn.model_selection import cross_val_predict
 from sklearn.metrics import roc_auc_score
+from sklearn.preprocessing import StandardScaler
 import xgboost as xgb
 from sklearn.ensemble import GradientBoostingClassifier
 from joblib import Parallel, delayed
@@ -85,15 +86,18 @@ def process_data(data):
     ## remove y from X
 
     X = pd.get_dummies(data)
+
     # X.net_proceeds = X.net_proceeds.apply(lambda x:0 if x == 'C' else x)
     # y = label_binarize(y, classes=[0, 1, 2, 3]) ## do we really have to do this?
-    X[['credit_score', 'mi_perc', 'units', 'ocltv', 'oupb', 'oltv', 'oint_rate', 'zip',
-       'curr_upb', 'loan_age', 'remain_months', 'curr_rate', 'curr_def_upb', 'ddlpi', 'mi_rec',
-       'non_mi_rec', 'exp', 'legal_costs', 'maint_exp', 'tax_insur', 'misc_exp', 'loss', 'mod_exp']] = \
-        scale(X[['credit_score', 'mi_perc', 'units', 'ocltv', 'oupb', 'oltv', 'oint_rate', 'zip',
-                 'curr_upb', 'loan_age', 'remain_months', 'curr_rate', 'curr_def_upb', 'ddlpi', 'mi_rec',
-                 'non_mi_rec', 'exp', 'legal_costs', 'maint_exp', 'tax_insur', 'misc_exp', 'loss', 'mod_exp']],
-              with_mean=False)
+    scaler = StandardScaler()
+    X = scaler.fit_transform(X)
+    #X[['credit_score', 'mi_perc', 'units', 'ocltv', 'oupb', 'oltv', 'oint_rate', 'zip',
+    #   'curr_upb', 'loan_age', 'remain_months', 'curr_rate', 'curr_def_upb', 'ddlpi', 'mi_rec',
+    #   'non_mi_rec', 'exp', 'legal_costs', 'maint_exp', 'tax_insur', 'misc_exp', 'loss', 'mod_exp']] = \
+    #    scale(X[['credit_score', 'mi_perc', 'units', 'ocltv', 'oupb', 'oltv', 'oint_rate', 'zip',
+    #             'curr_upb', 'loan_age', 'remain_months', 'curr_rate', 'curr_def_upb', 'ddlpi', 'mi_rec',
+    #             'non_mi_rec', 'exp', 'legal_costs', 'maint_exp', 'tax_insur', 'misc_exp', 'loss', 'mod_exp']],
+    #          with_mean=False)
     return X, y
 
 
