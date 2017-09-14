@@ -3,54 +3,38 @@ import pandas as pd
 from datetime import datetime
 import time
 import matplotlib.pyplot as plt
-import itertools
-from dateutil.relativedelta import relativedelta
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.neural_network import MLPClassifier
 from sklearn.svm import LinearSVC
 from sklearn.neighbors import KNeighborsClassifier
-from imblearn.over_sampling import SMOTE
-from imblearn.under_sampling import RandomUnderSampler, EditedNearestNeighbours
-from sklearn.metrics import classification_report, confusion_matrix, precision_score, recall_score, f1_score
-from imblearn.pipeline import Pipeline
 from sklearn.model_selection import GridSearchCV, ShuffleSplit, learning_curve, validation_curve
-from sklearn.preprocessing import scale
-from sklearn.metrics import roc_auc_score
 from sklearn.ensemble import GradientBoostingClassifier
-from sklearn.preprocessing import StandardScaler
 from joblib import Parallel, delayed
 pd.set_option('display.max_columns', None)
 import get_all_data
-import utility
+
 
 
 models = {
-    'DecisionTree': DecisionTreeClassifier(class_weight='balanced', max_depth=8),
-    'NeuralNetwork': MLPClassifier(hidden_layer_sizes=(160,)),
+    'DecisionTree': DecisionTreeClassifier(class_weight='balanced'),
+    'NeuralNetwork': MLPClassifier(verbose=5, hidden_layer_sizes=(160, 112, 112, 112, 112)),
     'GradientBoosting': GradientBoostingClassifier(max_depth=1, n_estimators=50),
-    #'SupportVectorMachine': LinearSVC(class_weight='balanced'),
+    'SupportVectorMachine': LinearSVC(class_weight='balanced'),
     'KNearestNeighbor': KNeighborsClassifier(n_neighbors=5)
 }
 
 
 params1 = {
     'DecisionTree': {'max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
-    'NeuralNetwork': {'hidden_layer_sizes': [(160), (160, 112, 112), (160, 112, 112, 112, 112), (160, 112, 112, 112, 112, 112, 112)]},
+    'NeuralNetwork': {'validation_fraction': [0.1, 0.25, 0.33, 0.5, 0.75, 0.9]},
     'GradientBoosting': {'max_depth': [1, 2, 3]},
     'SupportVectorMachine': {'C': [0.001, 0.01, 0.1, 1, 10, 100]},
-    'KNearestNeighbor': {'n_neighbors': [3,7,11]}}
+    'KNearestNeighbor': {'n_neighbors': [3,7,11]}
+}
 
 
-params2 = {
-    'DecisionTree': {'max_depth': [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]},
-    'NeuralNetwork': {'hidden_layer_sizes': [(160), (160, 112, 112), (160, 112, 112, 112, 112), (160, 112, 112, 112, 112, 112, 112)]},
-    'GradientBoosting': {'max_depth': [1, 2, 3]},
-    'SupportVectorMachine': {'C': [0.001, 0.01, 0.1, 1, 10, 100]},
-    'KNearestNeighbor': {'n_neighbors': [3,7,11]}}
-
-
-
+'''
 class EstimatorSelectionHelper:
     def __init__(self, models, params):
         if not set(models.keys()).issubset(set(params.keys())):
@@ -92,20 +76,22 @@ class EstimatorSelectionHelper:
         columns = columns + [c for c in df.columns if c not in columns]
         print(df[columns])
         return df[columns]
+'''
 
 
-def plot_complexity_curve(estimator, title, X, y, param_name, param_range, ylim=None, cv=None,
+
+
+def plot_complexity_curve(estimator, title, X, y, param_name, param_range, cv=None,
                         n_jobs=1):
     plt.figure()
     plt.title(title)
-    if ylim is not None:
-        plt.ylim(*ylim)
     plt.title("Validation Curves")
     plt.xlabel(param_name)
     plt.ylabel("Score")
     train_scores, test_scores = validation_curve(
         estimator, X, y, param_name=param_name, param_range=param_range,
-        cv=10, scoring="roc_auc", n_jobs=1)
+        cv=3, scoring="roc_auc", n_jobs=1)
+
     train_scores_mean = np.mean(train_scores, axis=1)
     train_scores_std = np.std(train_scores, axis=1)
     test_scores_mean = np.mean(test_scores, axis=1)
@@ -123,6 +109,8 @@ def plot_complexity_curve(estimator, title, X, y, param_name, param_range, ylim=
                      color="navy", lw=lw)
     plt.legend(loc="best")
     return plt
+
+
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
@@ -155,7 +143,7 @@ def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
     return plt
 
 
-
+'''
 def complexity():
     helper1 = EstimatorSelectionHelper(models, params2)
     all_data = get_all_data.get_all_data()
@@ -165,7 +153,7 @@ def complexity():
     X_train, X_val, y_train, y_val = train_test_split(training_features, training_target)
     helper1.fit(X_train, y_train, scoring='f1', n_jobs=1)
     helper1.score_summary(sort_by='min_score')
-
+'''
 
 
 
@@ -173,13 +161,13 @@ all_data = get_all_data.get_all_data()
 train, target = get_all_data.process_data(all_data)
 for model in models:
     title = model
-    #cv = ShuffleSplit(n_splits=10, test_size=0.2)
-    print(title)
-    #plot_learning_curve(models[model], title, train, target, cv=cv, n_jobs=1)
-    plot_complexity_curve(models[model], title, train, target, list(params1[model].keys())[0], list(params1[model].values())[0], cv=10, n_jobs=1)
+    cv = ShuffleSplit(n_splits=3, test_size=0.33)
+    print(title)ß
+    #plot_learning_curve(models[model], title, train, target, cv=cv, n_jobs=-1)
+    plot_complexity_curve(models[model], title, train, target, list(params1[model].keys())[0], list(params1[model].values())[0], cv=3, n_jobs=1)
     plt.show()
 
 
-#analysis2 = complexity()
+
 
 

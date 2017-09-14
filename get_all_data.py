@@ -26,7 +26,7 @@ pd.set_option('display.max_columns', None)
 
 
 def get_all_data():
-    dir = 'D:\\Backups\\StemData\\'
+    #dir = 'D:\\Backups\\StemData\\'
     files = ['sample_orig_2016.txt', 'sample_orig_2015.txt', 'sample_orig_2014.txt', 'sample_orig_2013.txt',
              'sample_orig_2012.txt', 'sample_orig_2011.txt',
              'sample_orig_2010.txt', 'sample_orig_2009.txt', 'sample_orig_2008.txt', 'sample_orig_2007.txt']
@@ -38,13 +38,13 @@ def get_all_data():
     merged_data = pd.DataFrame()
     for i in [0]:
         print(files[i])
-        raw = pd.read_csv(dir + files[i], sep='|', header=None, low_memory=False)
+        raw = pd.read_csv(files[i], sep='|', header=None, low_memory=False)
         raw.columns = ['credit_score', 'first_pmt_date', 'first_time', 'mat_date', 'msa', 'mi_perc', 'units',
                        'occ_status', 'ocltv', 'odti', 'oupb', 'oltv', 'oint_rate', 'channel', 'ppm', 'fixed_rate',
                        'state', 'prop_type', 'zip', 'loan_num', 'loan_purpose', 'oterm', 'num_borrowers', 'seller_name',
                        'servicer_name', 'exceed_conform']
 
-        raw1 = pd.read_csv(dir + files1[i], sep='|', header=None, low_memory=False)
+        raw1 = pd.read_csv(files1[i], sep='|', header=None, low_memory=False)
         raw1.columns = ['loan_num', 'yearmon', 'curr_upb', 'curr_delinq', 'loan_age', 'remain_months', 'repurchased',
                         'modified', 'zero_bal', 'zero_date', 'curr_rate', 'curr_def_upb', 'ddlpi', 'mi_rec',
                         'net_proceeds',
