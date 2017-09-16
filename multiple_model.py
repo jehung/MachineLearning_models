@@ -13,6 +13,8 @@ from sklearn.ensemble import GradientBoostingClassifier
 from joblib import Parallel, delayed
 pd.set_option('display.max_columns', None)
 import get_all_data
+import get_all_data_bloodDonation
+
 
 
 
@@ -114,7 +116,7 @@ def plot_complexity_curve(estimator, title, X, y, param_name, param_range, cv=No
 
 
 def plot_learning_curve(estimator, title, X, y, ylim=None, cv=None,
-                        n_jobs=1, train_sizes=np.linspace(.1, 1.0, 5)):
+                        n_jobs=-1, train_sizes=np.linspace(.1, 1.0, 5)):
     plt.figure()
     plt.title(title)
     if ylim is not None:
@@ -157,14 +159,18 @@ def complexity():
 
 
 
+#all_data_blood = get_all_data_bloodDonation.get_all_data_bloodDonation()
+#train, target = get_all_data_bloodDonation.process_data_bloodDonation(all_data_blood)
+
 all_data = get_all_data.get_all_data()
 train, target = get_all_data.process_data(all_data)
+
 for model in models:
     title = model
-    cv = ShuffleSplit(n_splits=3, test_size=0.33)
-    print(title)ß
-    #plot_learning_curve(models[model], title, train, target, cv=cv, n_jobs=-1)
-    plot_complexity_curve(models[model], title, train, target, list(params1[model].keys())[0], list(params1[model].values())[0], cv=3, n_jobs=1)
+    cv = ShuffleSplit(n_splits=5, test_size=0.33)
+    print(title)
+    plot_learning_curve(models[model], title, train, target, cv=cv, n_jobs=1)
+    #plot_complexity_curve(models[model], title, train, target, list(params1[model].keys())[0], list(params1[model].values())[0], cv=3, n_jobs=-1)
     plt.show()
 
 
