@@ -21,7 +21,7 @@ The zip folder includes the following files:
 - `Assign1_report.docx`
 
 
-The Jupyter Notebook and the Python code files contain exactly the same content, just different implementations. You can choose to either run the single Jupyter Notebook (ML_models_freddie-refactored.ipynb), or run multiple_model.py in Python IDE or at the command line. Either way, the code will import all required modules, read in all required data and performed the same set of computations.
+The Jupyter Notebook and the Python code files contain exactly the same content, just different implementations. You can choose to either run the single Jupyter Notebook (`ML_models_freddie-refactored.ipynb`), or run `multiple_model.py` in Python IDE or at the command line. Either way, the code will import all required modules, read in all required data and performed the same set of computations.
 
 ## Required Packages
 
