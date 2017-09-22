@@ -9,7 +9,7 @@ The zip folder includes the following files:
 
 #### Python code file
 - `multiple_model.py`
-- get_all_data.py
+- `get_all_data.py`
 - get_all_data_bloodDonation.py
 
 #### Data files
