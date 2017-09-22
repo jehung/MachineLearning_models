@@ -1,31 +1,41 @@
 # Comparison of Supervised Learning Models: Case Studies with Two Classification Problems
 
-The universal_portfolio is a Python-based script that allows users to specify a number of stock/mutual fund/exchanged-traded funds over an arbitrary period of time, to specify an investment strategy, and compare investment outcomes.
+The zip folder includes the following files:
 
-This Python code seeks to find the investment outcomes of different strategies such as old-fashioned buy-and-hold, as well as active rebalancing - while comparing each of the investment outcome against a benchmark. This benchmark can be arbitrarily specified by a user.
+Jupyter Notebook:
+ML_models_freddie-refactored.ipynb
+
+Pytho code file:
+multiple_model.py
+get_all_data.py
+get_all_data_bloodDonation.py
+
+Data files:
+sample_orig_2016.txt
+sample_svcg_2016.txt
+train_cleaned.csv
+
+Report:
+Assign1_report.docx
+
+
+The Jupyter Notebook and the Python code files contain exactly the same content, just different implementations. You can choose to either run the single Jupyter Notebook (ML_models_freddie-refactored.ipynb), or run multiple_model.py in Python IDE or at the command line. Either way, the code will import all required modules, read in all required data and performed the same set of computations.
 
 ## Required Packages
 
-To run the Python code, you must have already installed `NumPy`, `Pandas`, `Matpotlib`, as well as `pandas-datareader`, and `yahoo-finance`.
-
-## How to Run the Code
-
-### Python IDE
-Load the `.py` file in any Python IDE, and run.
-
-### Command Line
-`cd` into the directory where the package is saved or downloaded, and
-`python [filename.py]`
-
-## How to Use the Code
-
-In `universal_beat_this.py`, you can specify your own beanchmark investment, and further specify a list of tickers to invest in, as well as a starting date of the analysis. These values have been filled in by the project default values, but you are free to change it.
-
-## Technical Background
-
-The technical background was inspired by [Thomas M. Cover's Universal Portfolio theory](http://www-isl.stanford.edu/~cover/papers/paper93.pdf) . He demonstrated an algorithm for portfolio selection that outperforms the best stock in the market by actively rebalancing the weights of the investments daily. However, his algorithm had not taken into consideration the transaction costs.
-
-This Python code builds upon Cover's theory of actively balancing, and seeks to find the investment outcomes of different strategies such as old-fashioned buy-and-hold, as well as active rebalancing - while comparing each of the investment outcome against a benchmark.
+To run the Python code, you must have already installed the following:
+- `NumPy`
+- `Pandas`
+- `datetime`
+- `time`
+- `matplotlib`
+- `sklearn.model_selection`
+- `sklearn.tree`
+- `sklearn.neural_network`
+- `skelarn.svm`
+- `sklearn.ensemble`
+- `sklearn.neighbors`
+- `joblib`
 
 
 ## License
