@@ -5,10 +5,10 @@
 The zip folder includes the following files:
 
 #### Jupyter Notebook
-- ML_models_freddie-refactored.ipynb
+- `ML_models_freddie-refactored.ipynb`
 
 #### Python code file
-- multiple_model.py
+- `multiple_model.py`
 - get_all_data.py
 - get_all_data_bloodDonation.py
 
