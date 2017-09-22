@@ -1,21 +1,23 @@
 # Comparison of Supervised Learning Models: Case Studies with Two Classification Problems
 
+## Explanation of Files
+
 The zip folder includes the following files:
 
-Jupyter Notebook:
+### Jupyter Notebook
 ML_models_freddie-refactored.ipynb
 
-Pytho code file:
+### Python code file
 multiple_model.py
 get_all_data.py
 get_all_data_bloodDonation.py
 
-Data files:
+###Data files
 sample_orig_2016.txt
 sample_svcg_2016.txt
 train_cleaned.csv
 
-Report:
+### Report
 Assign1_report.docx
 
 
