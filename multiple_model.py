@@ -158,10 +158,6 @@ def complexity():
 '''
 
 
-
-#all_data_blood = get_all_data_bloodDonation.get_all_data_bloodDonation()
-#train, target = get_all_data_bloodDonation.process_data_bloodDonation(all_data_blood)
-
 all_data = get_all_data.get_all_data()
 train, target = get_all_data.process_data(all_data)
 
@@ -173,6 +169,17 @@ for model in models:
     #plot_complexity_curve(models[model], title, train, target, list(params1[model].keys())[0], list(params1[model].values())[0], cv=3, n_jobs=-1)
     plt.show()
 
+
+all_data_blood = get_all_data_bloodDonation.get_all_data_bloodDonation()
+train, target = get_all_data_bloodDonation.process_data_bloodDonation(all_data_blood)
+
+for model in models:
+    title = model
+    cv = ShuffleSplit(n_splits=5, test_size=0.33)
+    print(title)
+    plot_learning_curve(models[model], title, train, target, cv=cv, n_jobs=1)
+    #plot_complexity_curve(models[model], title, train, target, list(params1[model].keys())[0], list(params1[model].values())[0], cv=3, n_jobs=-1)
+    plt.show()
 
 
 
