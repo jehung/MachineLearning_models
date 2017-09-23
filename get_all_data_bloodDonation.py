@@ -29,16 +29,12 @@ def get_all_data_bloodDonation():
     file = 'train_cleaned.csv'
     data = pd.read_csv(file)
 
-    temp = (data['Months since First Donation'] - data['Months since Last Donation']) / data['Number of Donations']
-    temp -= data['Months since Last Donation']
-    data['if'] = abs(temp)
-
     return data
 
 
 
 def process_data_bloodDonation(data):
-    numerical_features = ['Number of Donations', 'Months since First Donation', 'Months since Last Donation', 'If']
+    numerical_features = ['Number of Donations', 'Months since First Donation', 'Months since Last Donation']
 
     y = data['Made Donation in March 2007']
     X = data.loc[:, numerical_features]
@@ -46,5 +42,3 @@ def process_data_bloodDonation(data):
     X = scaler.fit_transform(X)
 
     return X, y
-
-
